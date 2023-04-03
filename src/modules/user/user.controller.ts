@@ -8,8 +8,8 @@ export async function registerUserHandler(req: Req, reply: FastifyReply) {
 	const body = req.body;
 
 	try {
-		const { password, ...other } = await createUser(body);
-		return reply.code(201).send(other);
+		const user = await createUser(body);
+		return reply.code(201).send(user);
 
 	} catch (error) {
 		return reply.code(500).send(error);

@@ -1,7 +1,12 @@
 import fastify from "fastify";
 import userRoutes from "./modules/user/user.route";
+import { userSchema } from "./modules/user/user.schema";
 
 const app = fastify();
+
+for (const schema of userSchema) {
+  app.addSchema(schema)
+}
 
 app.register(userRoutes, { prefix: 'api/users'})
 
