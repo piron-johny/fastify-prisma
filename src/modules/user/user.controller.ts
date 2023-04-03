@@ -1,5 +1,17 @@
-import { FastifyReply, FastifyRequest } from "fastify";
+import { FastifyReply, FastifyRequest } from 'fastify';
+import { createUser } from './user.service';
+import { CreateUserInput } from './user.schema';
 
-export async function registerUserHandler(req: FastifyRequest, reply: FastifyReply) {
-  
+type Req = FastifyRequest<{ Body: CreateUserInput }>;
+
+export async function registerUserHandler(req: Req, reply: FastifyReply) {
+	const body = req.body;
+
+	try {
+		const { password, ...other } = await createUser(body);
+		return reply.code(201).send(other);
+
+	} catch (error) {
+		return reply.code(500).send(error);
+	}
 }

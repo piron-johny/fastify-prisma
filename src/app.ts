@@ -3,7 +3,7 @@ import userRoutes from "./modules/user/user.route";
 
 const app = fastify();
 
-app.register(userRoutes, { prefix: 'app/users'})
+app.register(userRoutes, { prefix: 'api/users'})
 
 app.get('/health',async (req, res) => {
   return {status: 'ok'}
