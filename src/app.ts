@@ -1,23 +1,41 @@
-import fastify from "fastify";
-import userRoutes from "./modules/user/user.route";
-import { userSchema } from "./modules/user/user.schema";
+import fastify, { FastifyReply, FastifyRequest } from 'fastify';
+import userRoutes from './modules/user/user.route';
+import { userSchema } from './modules/user/user.schema';
+import fastifyJwt from '@fastify/jwt';
+import 'dotenv/config';
 
-const app = fastify();
+const PORT = process.env.PORT ? Number(process.env.PORT) : 8000;
+
+export const app = fastify();
 
 for (const schema of userSchema) {
-  app.addSchema(schema)
+	app.addSchema(schema);
 }
 
-app.register(userRoutes, { prefix: 'api/users'})
+app.register(fastifyJwt, { secret: process.env.JWT_SECRET || '' });
+app.decorate(
+	'authonticate',
+	async (req: FastifyRequest, reply: FastifyReply) => {
+		try {
+			req.jwtVerify();
+		} catch (error) {
+			return reply.send(error);
+		}
+	}
+);
 
-app.get('/health',async (req, res) => {
-  return {status: 'ok'}
-})
+app.register(
+	async (app) => {
+		app.register(userRoutes, { prefix: '/users' });
+		app.get('/health', async () => ({ status: 'ok' }));
+	},
+	{ prefix: 'api' }
+);
 
-app.listen({ port: 8080 }, (err, address) => {
-  if (err) {
-    console.error(err)
-    process.exit(1)
-  }
-  console.log(`\nServer listening at ${address}\n`);
-})
+app.listen({ port: PORT, path: 'api' }, (err, address) => {
+	if (err) {
+		console.error(err);
+		process.exit(1);
+	}
+	console.log(`\nServer listening at ${address}\n`);
+});
