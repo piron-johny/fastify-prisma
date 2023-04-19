@@ -11,13 +11,18 @@ export const app = fastify();
 for (const schema of userSchema) {
 	app.addSchema(schema);
 }
+declare module 'fastify' {
+	export interface FastifyInstance {
+		authenticate: any;
+	}
+}
 
 app.register(fastifyJwt, { secret: process.env.JWT_SECRET || '' });
 app.decorate(
-	'authonticate',
+	'authenticate',
 	async (req: FastifyRequest, reply: FastifyReply) => {
 		try {
-			req.jwtVerify();
+			await req.jwtVerify();
 		} catch (error) {
 			return reply.send(error);
 		}

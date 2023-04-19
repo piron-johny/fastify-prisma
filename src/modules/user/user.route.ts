@@ -1,5 +1,9 @@
 import { FastifyInstance } from 'fastify';
-import { registerUserHandler, loginUserHandler } from './user.controller';
+import {
+	registerUserHandler,
+	loginUserHandler,
+	getAllUsersHandler,
+} from './user.controller';
 import { $ref } from './user.schema';
 
 async function userRoutes(app: FastifyInstance) {
@@ -23,6 +27,14 @@ async function userRoutes(app: FastifyInstance) {
 			},
 		},
 		loginUserHandler
+	);
+
+	app.get(
+		'/',
+		{
+			preHandler: [app.authenticate],
+		},
+		getAllUsersHandler
 	);
 }
 
